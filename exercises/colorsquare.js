@@ -1,5 +1,3 @@
-
-
 class ColorSquare{
 	/*
 	arguments: 
@@ -14,7 +12,14 @@ class ColorSquare{
 		you'll need to bind the handleClick method to this object:
 			this.handleClick = this.handleClick.bind(this)
 	*/
-	constructor( ){
+	constructor(availableColors, currentColor, str){
+		this.availableColors = availableColors;
+		this.colorIndex = currentColor;
+		this.futureDOMElement = str;
+		this.rightNeighbor = null;
+		this.newDOMCreated = null;
+
+		this.handleClick = this.handleClick.bind(this);
 	}
 	/*setter function for the property neighbor
 	new, somewhat limited support: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set
@@ -27,7 +32,11 @@ class ColorSquare{
 		if it is the right constructor, set the neightbor
 	*/
 	set neighbor( neighborObject ){
-
+		if (this.constructor === neighborObject.constructor) {
+			this.rightNeighbor = neighborObject;
+			return true;
+		}
+		return false;
 	}
 	/* getter function for the property neighbor
 	new, somewhat limited support: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get
@@ -37,7 +46,7 @@ class ColorSquare{
 		this object's property of the neighbor to the right
 	*/
 	get neighbor(){
-
+		return this.rightNeighbor;
 	}
 	/*
 	click handler for this dom element
@@ -54,7 +63,17 @@ class ColorSquare{
 			make sure the rightNeighbor is something!  the rightmost element won't have a neighbor
 		*/
 	handleClick(){
+		debugger;
+		if (this.colorIndex < this.availableColors.length-1) {
+			this.colorIndex++;
+		} else {
+			this.colorIndex = 0;
+		}
+		this.newDOMCreated.css('background-color', this.availableColors[this.colorIndex]);
 
+		if (this.rightNeighbor) {
+			this.rightNeighbor.handleClick();
+		}
 	}
 	/*
 	change the color of the current element
@@ -82,6 +101,11 @@ class ColorSquare{
 		return the dom element that was generated. 
 	*/
 	render(){
-
+		this.newDOMCreated = $("<div>").addClass(this.futureDOMElement);
+		this.newDOMCreated.on('click', this.handleClick);
+		this.newDOMCreated.css({
+			'background-color': this.availableColors[this.colorIndex]
+		})
+		return this.newDOMCreated;
 	}
 }

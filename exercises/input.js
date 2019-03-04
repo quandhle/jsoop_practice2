@@ -4,34 +4,38 @@ class Input{
 	//constructor takes in a a target input element
 	//should also construct variables for the range, the pattern, and the element that will hold the error message
 	//range min and max should default to null
-	constructor( ){
-
+	constructor(inputElement){
+		this.range = {};
+		this.pattern = null;
+		this.targetInput = inputElement;
+		this.result = {};
 	}
 	//setRange sets the minimum and maximum range, if necessary, for the input
 	//arguments : min (a number), and max (a number)
 	//returns: nothing
 	//purpose: sets the min and max values for the object
-	setRange(  ){
-
+	setRange(min, max){
+		this.range.min = min;
+		this.range.max = max;
 	}
 	//getRange gets the minimum and maximum range.
 	//arguments: nothing
 	//returns: an object with a property of min, and a property of max, containing the minimum and maximum numbers
 	getRange(){
-		
+		return this.range
 	}
 	//setPattern saves a regex pattern into the object
 	//arguments: pattern (a regular expression.  if you don't know what it is, you will learn it soon)
 	//returns: nothing
 	//saves the given pattern into the object
-	setPattern(  ){
-		
+	setPattern(pattern){
+		this.pattern = new RegExp(pattern);
 	}
 	//getPattern returns the currently stored pattern of the input object
 	//arguments: nothing
 	//returns: the currently stored regex pattern
 	getPattern(){
-		
+		return this.pattern;
 	}
 	//test runs all current tests on the target input and returns an object with data about whether the input passed or not
 	//arguments: nothing
@@ -50,8 +54,31 @@ class Input{
 		if it is still null, no range has been set, so don't test it
 			if it is not null, then test the range */
 	test(){
+		var result = {result: null, error: null};
+		if (isNaN(this.targetInput.val())) {
+			if ((this.pattern).test(this.targetInput.val())) {
+				result.result = true;
+			} else {
+				result.result = false;
+				result.error = 'pattern';
+			}
+		} else {
+			if ((this.pattern).test(parseFloat(this.targetInput.val()))) {
+				if (parseFloat(this.targetInput.val())>=this.range.min && parseFloat(this.targetInput.val())<=this.range.max) {
+					result.result = true;
+				} else {
+					result.result = false;
+					result.error = 'range';
+				}
+			} else {
+				result.result = false;
+				result.error = 'pattern';
+			}
+		}
 
+		return result
 	}
+
 	/*
 	showError: takes in a message, creates a dom element, and then positions that dom Element directly below the input
 	argument: message (a string)
@@ -69,8 +96,20 @@ class Input{
 		MAKE SURE TO STORE the reference to the dom element in the object for later use!
 		Don't store the CSS selector, you made the element, store the direct dom object itself!
 		*/
-	showError(  ){
-
+	showError(message){
+		var position = $(this.targetInput).position();
+		var parent = $(this.targetInput).parent();
+		$(parent).append(
+			$("<div>")
+				.text(message)
+				.addClass('inputError')
+				.css({
+					left: position.left,
+					height: $(parent).height(),
+					display: 'block',
+					position: 'absolute'
+				})
+		);
 	}
 	/*
 	hideError removes the error dom element from the DOM for the given input
@@ -80,6 +119,13 @@ class Input{
 		removes the dom element in question (https://www.w3schools.com/jquery/html_remove.asp)
 		*/
 	hideError(){
-		
+		var parent = $(this.targetInput).parent()
+		$(parent).children(".inputError").remove();
 	}
 }
+// when you set var range;
+// why is it undefined?
+// and not null?
+
+// difference between Number.isNaN()
+// and isNaN()?
